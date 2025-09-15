@@ -51,7 +51,6 @@ const Dashboard = () => {
       status: "Available",
       avatar: AVATAR,
     },
-    
   ];
   return (
     <div className="w-screen flex">
@@ -69,7 +68,10 @@ const Dashboard = () => {
             <h5 className="text-base font-semibold">User Name</h5>
             <p className="text-sm text-gray-500">My Account</p>
           </div>
-          <Settings className="ml-auto cursor-pointer text-gray-600" size={20} />
+          <Settings
+            className="ml-auto cursor-pointer text-gray-600"
+            size={20}
+          />
         </div>
         <hr className="border-b border-gray-300" />
         <div className="mx-6 mt-5">
@@ -118,7 +120,10 @@ const Dashboard = () => {
           <div className="flex items-center gap-4">
             <Phone size={22} className="text-gray-600 cursor-pointer" />
             <Video size={25} className="text-gray-600 cursor-pointer" />
-            <MoreHorizontal size={22} className="text-gray-600 cursor-pointer" />
+            <MoreHorizontal
+              size={22}
+              className="text-gray-600 cursor-pointer"
+            />
           </div>
         </div>
 
@@ -189,7 +194,8 @@ const Dashboard = () => {
         <div className="px-6 mt-4">
           <h5 className="text-sm text-gray-500 uppercase">About</h5>
           <p className="mt-2 text-sm text-gray-700 leading-relaxed">
-            Passionate developer with experience in React, Node.js, and UI/UX design.
+            Passionate developer with experience in React, Node.js, and UI/UX
+            design.
           </p>
         </div>
 
@@ -208,5 +214,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
