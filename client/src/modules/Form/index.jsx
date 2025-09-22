@@ -2,7 +2,10 @@ import React from "react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginAsync, signUpAsync } from "../../store/service/AuthService";
+import { clearError } from "../../store/AuthSlice";
 
 const Form = ({ isSignInPage = true }) => {
   const [data, setData] = useState({
@@ -10,6 +13,58 @@ const Form = ({ isSignInPage = true }) => {
     email: "",
     password: "",
   });
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error, user } = useSelector((state) => state.auth);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Clear any existing errors
+    if (error) {
+      dispatch(clearError());
+    }
+    
+    try {
+      let result;
+      if (isSignInPage) {
+        // Login
+        result = await dispatch(loginAsync({
+          email: data.email,
+          password: data.password
+        })).unwrap();
+        
+        if (result) {
+          navigate('/');
+        }
+      } else {
+        // Signup
+        result = await dispatch(signUpAsync({
+          fullName: data.fullName,
+          email: data.email,
+          password: data.password
+        })).unwrap();
+        
+        if (result) {
+          // Show success message or redirect to login
+          alert('Account created successfully! Please login.');
+          navigate('/user/login');
+        }
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      // Error is handled by Redux, no need to do anything here
+    }
+  };
+
+  // Clear errors when user starts typing
+  const handleInputChange = (field, value) => {
+    if (error) {
+      dispatch(clearError());
+    }
+    setData({ ...data, [field]: value });
+  };
 
   console.log("Data===> ", data);
   return (
@@ -21,9 +76,14 @@ const Form = ({ isSignInPage = true }) => {
         <div className="text-xl font-light mb-14">
           {isSignInPage ? "Sign in to get explored" : "Sign up to get started"}
         </div>
+        {error && (
+          <div className="text-red-500 text-sm mb-4 text-center">
+            {error}
+          </div>
+        )}
         <form
           className="flex flex-col justify-center w-full items-center"
-          onSubmit={() => console.log("Hello Form Submitted")}
+          onSubmit={handleSubmit}
         >
           {!isSignInPage && (
             <Input
@@ -33,7 +93,7 @@ const Form = ({ isSignInPage = true }) => {
               className={"mb-6"}
               isRequired={false}
               value={data.fullName}
-              onChange={(e) => setData({ ...data, fullName: e.target.value })}
+              onChange={(e) => handleInputChange('fullName', e.target.value)}
             />
           )}
           <Input
@@ -44,7 +104,7 @@ const Form = ({ isSignInPage = true }) => {
             isRequired={true}
             type="email"
             value={data.email}
-            onChange={(e) => setData({ ...data, email: e.target.value })}
+            onChange={(e) => handleInputChange('email', e.target.value)}
           />
           <Input
             name={"password"}
@@ -54,12 +114,12 @@ const Form = ({ isSignInPage = true }) => {
             className={"mb-6"}
             isRequired={true}
             value={data.password}
-            onChange={(e) => setData({ ...data, password: e.target.value })}
+            onChange={(e) => handleInputChange('password', e.target.value)}
           />
           <Button
             type="submit"
-            label={isSignInPage ? "Login" : "Create Account"}
-            onClick={() => console.log("Login Signup Clicked")}
+            label={isSignInPage ? (loading ? "Logging in..." : "Login") : (loading ? "Creating Account..." : "Create Account")}
+            disabled={loading}
             className={"w-3/5 mt-4"}
           />
         </form>
